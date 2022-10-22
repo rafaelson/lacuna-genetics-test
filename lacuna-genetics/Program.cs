@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Headers;
+﻿using System.Collections.Specialized;
+using System.Net.Http.Headers;
 using System.Text;
 
 namespace lacuna_genetics
@@ -83,7 +84,30 @@ namespace lacuna_genetics
                     $"Strand Encoded: {requestJobResponse.Job.StrandEncoded}\n" +
                     $"Gene Encoded: {requestJobResponse.Job.GeneEncoded}"
                     );
+
+                switch (requestJobResponse.Job.Type)
+                {
+                    case "EncodeStrand":
+                        EncodeStrand(requestJobResponse.Job.Id, requestJobResponse.Job.Strand);
+                        break;
+                }
+
             }
+        }
+
+        private static async Task EncodeStrand(string jobId, string strand)
+        {
+            var encodedStrand = Conversion.StringToBase64(strand);
+
+            var requestBody = new EncodeStrandBody { StrandEncoded = encodedStrand };
+
+            StringContent payload = CreateHTTPPayload(requestBody);
+
+            var response = await s_client.PostAsync($"api/dna/jobs/{jobId}/encode", payload);
+            EncodeStrandResponse encodeStrandResponse = JsonExtensions.Deserialize<EncodeStrandResponse>(await response.Content.ReadAsStringAsync());
+
+            Console.WriteLine($"Code: {encodeStrandResponse.Code}\n" +
+                $"Message: {encodeStrandResponse.Message}");
         }
 
     }
