@@ -1,6 +1,5 @@
 ﻿using System.Net.Http.Headers;
 using System.Text;
-using System.Text.Json;
 
 namespace lacuna_genetics
 {
@@ -29,7 +28,7 @@ namespace lacuna_genetics
 
         internal static StringContent CreateHTTPPayload<T>(T input)
         {
-            var serializedRequest = JsonSerializer.Serialize(input);
+            var serializedRequest = JsonExtensions.Serialize(input);
             var payload = new StringContent(serializedRequest, Encoding.UTF8, "application/json");
             return payload;
         }
@@ -46,7 +45,7 @@ namespace lacuna_genetics
             StringContent payload = CreateHTTPPayload(requestBody);
             var response = await s_client.PostAsync("api/users/create", payload);
 
-            EnrollResponse enrollResponse = JsonSerializer.Deserialize<EnrollResponse>(await response.Content.ReadAsStringAsync());
+            EnrollResponse enrollResponse = JsonExtensions.Deserialize<EnrollResponse>(await response.Content.ReadAsStringAsync());
 
             Console.WriteLine($"Code: {enrollResponse.Code} \n Message: {enrollResponse.Message}");
 
@@ -57,11 +56,8 @@ namespace lacuna_genetics
             var requestBody = new RequestTokenBody { Username = user, Password = pass };
             StringContent payload = CreateHTTPPayload(requestBody);
             var response = await s_client.PostAsync("api/users/login", payload);
-
-            RequestTokenResponse requestTokenResponse = JsonSerializer.Deserialize<RequestTokenResponse>(await response.Content.ReadAsStringAsync());
-            //Console.WriteLine($"Access Token: {requestTokenResponse.AccessToken} \n" +
-            //    $"Code: {requestTokenResponse.Code} \n" +
-            //    $"Message: {requestTokenResponse.Message}");
+            RequestTokenResponse requestTokenResponse = JsonExtensions.Deserialize<RequestTokenResponse>(await response.Content.ReadAsStringAsync());
+            
             if (requestTokenResponse.Code == "Success")
             {
                 return requestTokenResponse.AccessToken;
@@ -74,8 +70,20 @@ namespace lacuna_genetics
             var authToken = await RequestToken(user, pass);
             s_client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
             var response = await s_client.GetStringAsync("api/dna/jobs");
-          
-            Console.WriteLine(JsonSerializer.Deserialize<JobResponse>(response));
+
+            var requestJobResponse = JsonExtensions.Deserialize<RequestJobResponse>(response);
+
+            if (requestJobResponse.Code == "Success")
+            {
+                Console.WriteLine(
+                    $"Code: {requestJobResponse.Code}\n" +
+                    $"Job id: {requestJobResponse.Job.Id}\n" +
+                    $"Job type: {requestJobResponse.Job.Type}\n" +
+                    $"Strand: {requestJobResponse.Job.Strand}\n" +
+                    $"Strand Encoded: {requestJobResponse.Job.StrandEncoded}\n" +
+                    $"Gene Encoded: {requestJobResponse.Job.GeneEncoded}"
+                    );
+            }
         }
 
     }
