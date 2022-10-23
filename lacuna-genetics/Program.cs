@@ -1,6 +1,4 @@
-﻿using System.Collections.Specialized;
-using System.Net.Http.Headers;
-using System.Text;
+﻿using System.Net.Http.Headers;
 
 namespace lacuna_genetics
 {
@@ -30,7 +28,7 @@ namespace lacuna_genetics
         internal static StringContent CreateHTTPPayload<T>(T input)
         {
             var serializedRequest = JsonExtensions.Serialize(input);
-            var payload = new StringContent(serializedRequest, Encoding.UTF8, "application/json");
+            var payload = new StringContent(serializedRequest, System.Text.Encoding.UTF8, "application/json");
             return payload;
         }
 
@@ -58,7 +56,7 @@ namespace lacuna_genetics
             StringContent payload = CreateHTTPPayload(requestBody);
             var response = await s_client.PostAsync("api/users/login", payload);
             RequestTokenResponse requestTokenResponse = JsonExtensions.Deserialize<RequestTokenResponse>(await response.Content.ReadAsStringAsync());
-            
+
             if (requestTokenResponse.Code == "Success")
             {
                 return requestTokenResponse.AccessToken;
@@ -97,7 +95,7 @@ namespace lacuna_genetics
 
         private static async Task EncodeStrand(string jobId, string strand)
         {
-            var encodedStrand = Conversion.StringToBase64(strand);
+            var encodedStrand = Encoding.StringToBase64(strand);
 
             var requestBody = new EncodeStrandBody { StrandEncoded = encodedStrand };
 

@@ -1,6 +1,6 @@
 ﻿namespace lacuna_genetics
 {
-    public class Conversion
+    public class Encoding
     {
         public static string StringToBase64(string strand)
         {
@@ -9,10 +9,10 @@
 
         private static string StringToBits(string strand)
         {
-            string A = "00";
-            string C = "01";
-            string T = "11";
-            string G = "10";
+            const string A = "00";
+            const string C = "01";
+            const string T = "11";
+            const string G = "10";
             string final = "";
 
             foreach (char c in strand)
