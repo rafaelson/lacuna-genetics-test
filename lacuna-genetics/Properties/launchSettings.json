@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "lacuna-genetics": {
-      "commandName": "Project",
-      "commandLineArgs": "testDecode TbSh"
-    }
-  }
-}
