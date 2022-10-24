@@ -86,8 +86,12 @@ namespace lacuna_genetics
                 switch (requestJobResponse.Job.Type)
                 {
                     case "EncodeStrand":
-                        EncodeStrand(requestJobResponse.Job.Id, requestJobResponse.Job.Strand);
+                        await EncodeStrand(requestJobResponse.Job.Id, requestJobResponse.Job.Strand);
                         break;
+                    case "DecodeStrand":
+                        await DecodeStrand(requestJobResponse.Job.Id, requestJobResponse.Job.StrandEncoded);
+                        break;
+                    
                 }
 
             }
@@ -106,6 +110,21 @@ namespace lacuna_genetics
 
             Console.WriteLine($"Code: {encodeStrandResponse.Code}\n" +
                 $"Message: {encodeStrandResponse.Message}");
+        }
+
+        private static async Task DecodeStrand(string jobId, string strandBase64)
+        {
+            var decodedStrand = Decoding.Base64ToString(strandBase64);
+
+            var requestBody = new DecodeStrandBody { Strand = decodedStrand };
+            StringContent payload = CreateHTTPPayload(requestBody);
+
+            var response = await s_client.PostAsync($"api/dna/jobs/{jobId}/decode", payload);
+
+            DecodeStrandResponse decodeStrandResponse = JsonExtensions.Deserialize<DecodeStrandResponse>(await response.Content.ReadAsStringAsync());
+
+            Console.WriteLine($"Code: {decodeStrandResponse.Code}\n" +
+                $"Message: {decodeStrandResponse.Message}");
         }
 
     }
