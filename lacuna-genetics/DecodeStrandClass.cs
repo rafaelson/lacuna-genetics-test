@@ -8,7 +8,7 @@ namespace lacuna_genetics
 {
     public class DecodeStrandBody
     {
-        public string Strand { get; set; };
+        public string Strand { get; set; }
 
         public DecodeStrandBody() {}
     }
