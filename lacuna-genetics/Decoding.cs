@@ -20,6 +20,7 @@
             foreach (byte b in hex)
             {
                 temp = Convert.ToString(b, toBase: 2);
+                
                 if (temp.Length != 8)
                 {
                     int diff = 8 - temp.Length;

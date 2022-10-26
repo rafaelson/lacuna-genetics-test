@@ -5,6 +5,7 @@
         public static string ComplementaryToTemplate(string strand)
         {
             string templateStrand = "";
+            
             foreach(char c in strand)
             {
                 switch (c)
@@ -26,6 +27,7 @@
                         break;
                 }
             }
+
             return templateStrand;
         }
     }

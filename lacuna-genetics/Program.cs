@@ -4,7 +4,6 @@ namespace lacuna_genetics
 {
     internal class Program
     {
-
         private static HttpClient s_client = new HttpClient() { BaseAddress = new Uri("https://gene.lacuna.cc/") };
 
         internal static async Task Main(string[] args)
