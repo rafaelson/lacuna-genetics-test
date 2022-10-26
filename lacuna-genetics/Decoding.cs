@@ -6,25 +6,30 @@
         {
             return BitsToString(ByteToBits(Base64ToByte(base64Str)));
         }
-        
+
         private static byte[] Base64ToByte(string base64Str)
         {
             return Convert.FromBase64String(base64Str);
         }
-        
+
         private static string ByteToBits(byte[] hex)
         {
             string bits = "";
+            string temp;
 
-            foreach(byte b in hex)
+            foreach (byte b in hex)
             {
-                bits += Convert.ToString(b, toBase: 2);
+                temp = Convert.ToString(b, toBase: 2);
+                if (temp.Length != 8)
+                {
+                    int diff = 8 - temp.Length;
+                    var zeroes = String.Concat(Enumerable.Repeat('0', diff));
+                    temp = $"{zeroes}{temp}";
+                }
+
+                bits += temp;
             }
-            if(bits.Length % 2 != 0)
-            {
-                bits = $"0{bits}";
-            }
-            
+
             return bits;
         }
 
@@ -36,9 +41,9 @@
             const string G = "10";
             string strand = "";
 
-            for(int i = 0; i < bits.Length; i += 2)
+            for (int i = 0; i < bits.Length; i += 2)
             {
-                switch(bits.Substring(i, 2))
+                switch (bits.Substring(i, 2))
                 {
                     case A:
                         strand += 'A';
