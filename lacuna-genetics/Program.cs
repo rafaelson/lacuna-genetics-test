@@ -14,15 +14,8 @@ namespace lacuna_genetics
                 case "enroll":
                     await Enroll(args[1], args[2], args[3]);
                     break;
-                case "requestToken":
-                    await RequestToken(args[1], args[2]);
-                    break;
                 case "request":
                     await RequestJob(args[1], args[2]);
-                    break;
-                case "geneCheck":
-                    var bolo = Checking.Gene(args[1], args[2]);
-                    Console.WriteLine(bolo.ToString());
                     break;
             }
 
@@ -47,7 +40,6 @@ namespace lacuna_genetics
             };
             StringContent payload = CreateHTTPPayload(requestBody);
             var response = await s_client.PostAsync("api/users/create", payload);
-
             EnrollResponse enrollResponse = JsonExtensions.Deserialize<EnrollResponse>(await response.Content.ReadAsStringAsync());
 
             Console.WriteLine($"Code: {enrollResponse.Code} \n Message: {enrollResponse.Message}");
@@ -73,7 +65,6 @@ namespace lacuna_genetics
             var authToken = await RequestToken(user, pass);
             s_client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", authToken);
             var response = await s_client.GetStringAsync("api/dna/jobs");
-
             var requestJobResponse = JsonExtensions.Deserialize<RequestJobResponse>(response);
 
             if (requestJobResponse.Code == "Success")
@@ -106,11 +97,8 @@ namespace lacuna_genetics
         private static async Task EncodeStrand(string jobId, string strand)
         {
             var strandEncoded = Encoding.StringToBase64(strand);
-
             var requestBody = new EncodeStrandBody { StrandEncoded = strandEncoded };
-
             StringContent payload = CreateHTTPPayload(requestBody);
-
             var response = await s_client.PostAsync($"api/dna/jobs/{jobId}/encode", payload);
             EncodeStrandResponse encodeStrandResponse = JsonExtensions.Deserialize<EncodeStrandResponse>(await response.Content.ReadAsStringAsync());
 
@@ -121,12 +109,9 @@ namespace lacuna_genetics
         private static async Task DecodeStrand(string jobId, string strandEncoded)
         {
             var strandDecoded = Decoding.Base64ToString(strandEncoded);
-
             var requestBody = new DecodeStrandBody { Strand = strandDecoded };
             StringContent payload = CreateHTTPPayload(requestBody);
-
             var response = await s_client.PostAsync($"api/dna/jobs/{jobId}/decode", payload);
-
             DecodeStrandResponse decodeStrandResponse = JsonExtensions.Deserialize<DecodeStrandResponse>(await response.Content.ReadAsStringAsync());
 
             Console.WriteLine($"Code: {decodeStrandResponse.Code}\n" +
@@ -137,18 +122,16 @@ namespace lacuna_genetics
         {
             var strandDecoded = Decoding.Base64ToString(strandEncoded);
             var geneDecoded = Decoding.Base64ToString(geneEncoded);
+            
             if(strandDecoded.Substring(0, 3) != "CAT")
             {
                 strandDecoded = Converting.ComplementaryToTemplate(strandDecoded);
             }
+            
             var geneIsActivated = Checking.Gene(strandDecoded, geneDecoded);
-
             var requestBody = new CheckGeneBody { IsActivated = geneIsActivated };
-
             StringContent payload = CreateHTTPPayload(requestBody);
-
             var response = await s_client.PostAsync($"api/dna/jobs/{jobId}/gene", payload);
-
             CheckGeneResponse checkGeneResponse = JsonExtensions.Deserialize<CheckGeneResponse>(await response.Content.ReadAsStringAsync());
 
             Console.WriteLine($"Code: {checkGeneResponse.Code}\n" +
